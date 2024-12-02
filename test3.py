@@ -1,4 +1,4 @@
-from test_ai5_music import freq_detection
+from onlyWindow import freq_detection
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import wavfile
@@ -25,7 +25,7 @@ for n in range(n_points):
     noise_var = 1 / (snr[n]*2)
     noise = np.random.normal(scale=np.sqrt(noise_var), size=len(audio_data))
     x_n = audio_data + noise
-    t_est, f_est = freq_detection(x_n, fs, 2048)
+    t_est, f_est = freq_detection(x_n, fs,N= 2048)
     f_estarray[n] = np.mean(f_est)
     variance[n] = np.std(f_est)
     delta_f[n] = np.abs(true_freq - f_estarray[n])

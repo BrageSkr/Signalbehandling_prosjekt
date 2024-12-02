@@ -1,11 +1,11 @@
-from test_ai4 import freq_detection
+from final_algorithm import freq_detection
 import matplotlib.pyplot as plt
 import numpy as np
 #  parameters
-fs = 10_000  # Samples/second
+fs = 10000  # Samples/second
 N = 4*fs  # Samples
-f = 300  # Hertz
-f2= 400 #Hertz
+f = 300.5  # Hertz
+f2= 600.8 #Hertz
 A = 1  # Volts
 noise_var = 1 # V^2
 
@@ -17,8 +17,8 @@ x_n = signal+noise
 x_n2 =  A*np.sin(2*np.pi*f2*t_n) + noise
 x_total = np.concatenate((x_n, x_n2))
 
-t_est, f_est = freq_detection(x_total, fs, 1024)
-t_est2, f_est2 = freq_detection(x_total, fs, 2048)
+t_est, f_est = freq_detection(x_total, fs, N=1024)
+t_est2, f_est2 = freq_detection(x_total, fs, N=2048)
 plt.close(1)
 plt.figure(1)
 
