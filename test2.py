@@ -1,4 +1,4 @@
-from onlyWindow import freq_detection
+from onlyFilter import freq_detection
 import matplotlib.pyplot as plt
 import numpy as np
 

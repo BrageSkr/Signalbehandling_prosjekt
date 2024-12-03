@@ -22,7 +22,7 @@ snr = 1/inv_snr
 
 
 for n in range(n_points):
-    noise_var = 1 / (snr[n]*2)
+    noise_var = 1 #/ (snr[n]*2)
     noise = np.random.normal(scale=np.sqrt(noise_var), size=len(audio_data))
     x_n = audio_data + noise
     t_est, f_est = freq_detection(x_n, fs,N= 2048)

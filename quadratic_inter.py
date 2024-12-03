@@ -2,9 +2,7 @@ import numpy as np
 
 
 def freq_detection(x_n: np.ndarray, fs: int, N: int = 1024) -> tuple:
-    """
-    Frequency detection using quadratic interpolation.
-    """
+
     timestamps = []
     freqs = []
     for window_start in range(0, len(x_n), N):

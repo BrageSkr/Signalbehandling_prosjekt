@@ -1,4 +1,4 @@
-from final_algorithm import freq_detection
+from baseline import freq_detection
 import matplotlib.pyplot as plt
 import numpy as np
 #  parameters

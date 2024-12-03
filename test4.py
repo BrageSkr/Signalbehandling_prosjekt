@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from final_algorithm import freq_detection
 
-
 def generate_dynamic_signal(freq_changes, duration=2.0, fs=44100):
     t = np.linspace(0, duration, int(fs * duration))
     signal = np.zeros_like(t)
@@ -24,16 +23,18 @@ def generate_dynamic_signal(freq_changes, duration=2.0, fs=44100):
     signal = np.convolve(signal, np.hanning(window_size) / np.sum(np.hanning(window_size)), mode='same')
     return signal, t, actual_freqs
 
-
 def test_freq_detection_dynamic(freq_changes, duration=2.0, fs=44100, snr_db=20):
+    # Generate signal
     pure_signal, t, actual_freqs = generate_dynamic_signal(freq_changes, duration, fs)
     pure_signal = pure_signal / np.max(np.abs(pure_signal))
 
+    # Add noise
     signal_power = np.mean(pure_signal ** 2)
     noise_power = signal_power / (10 ** (snr_db / 10))
     noise = np.random.normal(0, np.sqrt(noise_power), len(pure_signal))
     noisy_signal = pure_signal + noise
 
+    # Detect frequencies
     timestamps, freqs = freq_detection(noisy_signal, fs, N=2048)
     timestamps = np.array(timestamps)
     freqs = np.array(freqs)
@@ -50,10 +51,10 @@ def test_freq_detection_dynamic(freq_changes, duration=2.0, fs=44100, snr_db=20)
         actual_freq = freq_changes[i][1]
         detected_freqs = freqs[mask]
 
-        # Get middle 10 samples
+        # Get middle samples
         mid_point = len(detected_freqs) // 2
-        start_idx = mid_point -1
-        end_idx = mid_point +1
+        start_idx = mid_point - 1
+        end_idx = mid_point + 1
         if start_idx < 0:
             start_idx = 0
             end_idx = min(10, len(detected_freqs))
@@ -65,13 +66,13 @@ def test_freq_detection_dynamic(freq_changes, duration=2.0, fs=44100, snr_db=20)
         delta = np.abs(middle_freqs - actual_freq)
         middle_deltas.append(delta)
 
+    # Calculate statistics
     all_deltas = np.concatenate(middle_deltas)
     mean_delta = np.mean(all_deltas)
     max_delta = np.max(all_deltas)
 
-    plt.figure(figsize=(15, 10))
-
-    plt.subplot(3, 1, 1)
+    # Plot frequency tracking
+    plt.figure(figsize=(12, 6))
     plt.plot(t, actual_freqs, 'r--', label='True Frequency', alpha=0.7)
     plt.plot(timestamps, freqs, 'b-', label='Detected Frequency')
     plt.grid(True)
@@ -81,36 +82,15 @@ def test_freq_detection_dynamic(freq_changes, duration=2.0, fs=44100, snr_db=20)
     plt.legend()
     plt.ylim(0, max(max(actual_freqs), max(freqs)) * 1.1)
 
-    plt.subplot(3, 1, 2)
-    actual_freqs_interp = np.interp(timestamps, t, actual_freqs)
-    freq_deltas = np.abs(freqs - actual_freqs_interp)
-    plt.plot(timestamps, freq_deltas, 'g-', label='Frequency Delta')
-    plt.grid(True)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Frequency Delta (Hz)')
-    plt.title(f'Frequency Delta (Mean of Middle Samples: {mean_delta:.2f} Hz, Max: {max_delta:.2f} Hz)')
-    plt.legend()
-
-    plt.subplot(3, 1, 3)
-    plt.plot(t, noisy_signal, 'b-', label=f'Signal (SNR={snr_db}dB)', alpha=0.7)
-    for change_time, freq in freq_changes:
-        plt.axvline(x=change_time, color='r', linestyle='--', alpha=0.5)
-        plt.text(change_time, np.max(noisy_signal), f'{freq}Hz', rotation=90, verticalalignment='bottom')
-    plt.grid(True)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.title('Signal Waveform with Frequency Change Points')
-    plt.legend()
-
     plt.tight_layout()
     plt.show()
 
+    # Print performance metrics
     print("\nMiddle Samples Performance Metrics:")
     print(f"Mean Delta (Middle Samples): {mean_delta:.2f} Hz")
     print(f"Max Delta (Middle Samples): {max_delta:.2f} Hz")
     for i, deltas in enumerate(middle_deltas):
         print(f"Segment {i + 1} Mean Delta: {np.mean(deltas):.2f} Hz")
-
 
 if __name__ == "__main__":
     freq_changes = [
